@@ -7,10 +7,23 @@ void Main()
 
 public static void DumpTskFiles()
 {
+  GetTasksFilterByRecurrence().Dump();
+}
+
+public static IEnumerable<XElement>
+  GetTasksFilterByRecurrence()
+{
   var q =
-    from x in GetTaskcoachXMLStreams()
-    select x;
-  q.Dump();
+    from tskfp in GetTaskcoachXMLStreams()
+    from tsk in tskfp.Descendants("task")
+    let recurrence = tsk.Elements("recurrence").SingleOrDefault()
+    let excludeRecurrences = new[] {"daily"}
+    where false 
+      || recurrence == null
+      || !excludeRecurrences.Contains(
+           recurrence.Attribute("unit").Value)
+    select tsk;
+  return q;
 }
 
 public static IEnumerable<XElement> GetTaskcoachXMLStreams()
