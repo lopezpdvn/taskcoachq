@@ -7,7 +7,20 @@ void Main()
 
 public static void DumpTskFiles()
 {
-  GetTasksFilterByRecurrence().Dump();
+  GetRecurrenceUnits().Distinct()
+                      .OrderBy(e => e)
+                      .Dump();
+}
+
+public static IEnumerable<string> GetRecurrenceUnits()
+{
+  var q =
+    from tskfp in GetTaskcoachXMLStreams()
+    from tsk in tskfp.Descendants("task")
+    from rec in tsk.Descendants("recurrence")
+    from unit in rec.Attributes("unit")
+    select unit.Value;
+  return q;
 }
 
 public static IEnumerable<XElement>
