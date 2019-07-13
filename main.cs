@@ -7,9 +7,20 @@ void Main()
 
 public static void DumpTskFiles()
 {
-  GetElementNames().Distinct()
-                   .OrderBy(e => e)
-                   .Dump();
+  GetTaskcoachXMLStreamsWOEfforts().Dump();
+}
+
+private static IEnumerable<XElement>
+  GetTaskcoachXMLStreamsWOEfforts()
+{
+  var q = GetTaskcoachXMLStreams();
+  foreach (var x in q)
+  {
+    x.Descendants("effort")
+     .ToList()
+     .Remove();
+    yield return x;
+  }
 }
 
 private static IEnumerable<string> GetElementNames()
