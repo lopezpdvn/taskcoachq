@@ -7,9 +7,18 @@ void Main()
 
 public static void DumpTskFiles()
 {
-  GetRecurrenceUnits().Distinct()
-                      .OrderBy(e => e)
-                      .Dump();
+  GetElementNames().Distinct()
+                   .OrderBy(e => e)
+                   .Dump();
+}
+
+private static IEnumerable<string> GetElementNames()
+{
+  var q =
+    from tskfp in GetTaskcoachXMLStreams()
+    from e in tskfp.DescendantsAndSelf()
+    select e.Name.ToString();
+  return q;
 }
 
 public static IEnumerable<string> GetRecurrenceUnits()
@@ -45,7 +54,7 @@ public static IEnumerable<XElement> GetTaskcoachXMLStreams()
          select XElement.Load(xml.FullName);
 }
 
-// Name argument is case-insensitive.
+// `envVarName` argument is case-insensitive.
 public static IEnumerable<FileInfo> GetTaskcoachXMLs(
   string envVarName = "TASKCOACH_FP")
 {
