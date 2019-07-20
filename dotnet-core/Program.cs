@@ -9,9 +9,12 @@ namespace taskcoachq
     {
         static void Main(string[] args)
         {
-            foreach(var x in GetTaskcoachXMLs())
+            var q = GetTaskcoachXMLs().Zip(
+                GetSrcCtrlPaths(),
+                (a, b) => $"`{a.FullName}` => `{b.FullName}`");
+            foreach(var t in q)
             {
-                Console.WriteLine(x);
+                Console.WriteLine(t);
             }
         }
 
@@ -36,6 +39,17 @@ namespace taskcoachq
               && _fp.Extension.ToLower() == tskExtDefault
             select _fp;
         return q;
+        }
+
+        public static IEnumerable<FileInfo> GetSrcCtrlPaths(
+            string fileExtDefault = ".tsksrcctrl")
+        {
+            var q =
+              from e in GetTaskcoachXMLs()
+              let fPath = Path.ChangeExtension(
+                e.FullName, fileExtDefault)
+              select new FileInfo(fPath);
+            return q;
         }
     }
 }
