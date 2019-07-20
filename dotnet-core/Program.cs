@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace taskcoachq
 {
@@ -9,13 +10,27 @@ namespace taskcoachq
     {
         static void Main(string[] args)
         {
-            var q = GetTaskcoachXMLs().Zip(
-                GetSrcCtrlPaths(),
-                (a, b) => $"`{a.FullName}` => `{b.FullName}`");
+            IEnumerable<(FileInfo src, FileInfo dst)> q =
+                GetTaskcoachXMLs().Zip(
+                    GetSrcCtrlPaths(),
+                    (src, dst) => (src, dst));
             foreach(var t in q)
             {
-                Console.WriteLine(t);
+                using(var srcF = t.src.OpenRead())
+                using(var dstF = t.dst.OpenWrite())
+                {
+                    var srcXE = XElement.Load(srcF);
+                    var dstXE =
+                        GetSourceControllableTskFile(srcXE);
+                    dstXE.Save(dstF);
+                }
             }
+        }
+
+        private static XElement GetSourceControllableTskFile(
+            XElement xeIn)
+        {
+            return xeIn;
         }
 
         public static IEnumerable<FileInfo> GetTaskcoachXMLs(
