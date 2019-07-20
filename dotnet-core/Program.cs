@@ -16,7 +16,8 @@ namespace taskcoachq
         }
 
         public static IEnumerable<FileInfo> GetTaskcoachXMLs(
-            string envVarName = "TASKCOACH_FP")
+            string envVarName = "TASKCOACH_FP",
+            string tskExtDefault = ".tsk")
         {
         var TASKCOACH_XML_ENV =
             Environment.GetEnvironmentVariable(envVarName);
@@ -29,7 +30,11 @@ namespace taskcoachq
         var q =
             from fp in TASKCOACH_XML_ENV.Split(
               new[] {Path.PathSeparator}, StringSplitOptions.None)
-            select new FileInfo(fp);
+            let _fp = new FileInfo(fp)
+            where true
+              && _fp.Exists
+              && _fp.Extension.ToLower() == tskExtDefault
+            select _fp;
         return q;
         }
     }
