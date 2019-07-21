@@ -16,20 +16,24 @@ namespace taskcoachq
                     (src, dst) => (src, dst));
             foreach(var t in q)
             {
+                t.dst.Delete();
                 using(var srcF = t.src.OpenRead())
                 using(var dstF = t.dst.OpenWrite())
                 {
                     var srcXE = XElement.Load(srcF);
                     var dstXE =
-                        GetSourceControllableTskFile(srcXE);
+                        GetTskFileWOEfforts(srcXE);
                     dstXE.Save(dstF);
                 }
             }
         }
 
-        private static XElement GetSourceControllableTskFile(
+        private static XElement GetTskFileWOEfforts(
             XElement xeIn)
         {
+            xeIn.Descendants("effort")
+                .ToList()
+                .Remove();
             return xeIn;
         }
 
